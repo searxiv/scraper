@@ -1,24 +1,17 @@
-name: main
+name: searxiv-scraper
 
 on:
   push:
     branches: ["*"]
 
-env:
-  CARGO_TERM_COLOR: always
+permissions:
+  packages: write
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y libpoppler-glib-dev
-      - name: Build
-        run: cargo build --verbose
-      - name: Check formatting
-        run: cargo fmt --check
-      - name: Run tests
-        run: cargo test --verbose
-      - name: Run Clippy
-        run: cargo clippy --all-targets --all-features
+    uses: ./.github/workflows/build.yml
+
+  container:
+    uses: ./.github/workflows/container.yml
+    needs: [ build ]
+    if: github.ref == 'refs/heads/main'
