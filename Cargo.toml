@@ -20,3 +20,9 @@ tokio = { version = "1.36.0", features = ["full"] }
 indicatif = "0.17.8"
 chrono = { version = "0.4.35", features = ["serde"] }
 serde_json = "1.0.114"
+scraper = "0.19.0"
+poppler-rs = { version = "0.23.0", features = ["v23_7"] }
+glib = "0.19.2"
+regex = "1.10.3"
+futures = "0.3.30"
+futures-util = "0.3.30"

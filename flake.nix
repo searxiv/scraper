@@ -23,7 +23,11 @@
         overlays = [ (import rust-overlay) ];
         pkgs = import nixpkgs { inherit system overlays; };
         rustToolchain = pkgs.rust-bin.stable.latest.complete;
-        buildInputs = with pkgs; [ rustToolchain ];
+        buildInputs = with pkgs; [
+          rustToolchain
+          pkg-config
+          poppler
+        ];
         naersk' = pkgs.callPackage naersk { };
       in
       rec {

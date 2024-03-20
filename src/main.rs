@@ -19,15 +19,18 @@ async fn main() -> anyhow::Result<()> {
     // Initialize logger
     env_logger::init_from_env(env_logger::Env::default().default_filter_or(&config.log_level));
 
+    let sleep_interval = Duration::from_millis(config.request_interval_millis);
     let scraper = scraper::Scraper::new(config).await;
 
     // Constantly wait for tasks
     loop {
         let task = scraper.get_next_task().await;
         if let Some(task) = task {
-            scraper.scrape(task).await;
+            if let Err(e) = scraper.scrape(task).await {
+                log::error!("Failed task: {e}");
+            }
         }
 
-        sleep(Duration::from_millis(500)).await;
+        sleep(sleep_interval).await;
     }
 }
