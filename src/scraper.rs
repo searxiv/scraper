@@ -132,7 +132,7 @@ impl Scraper {
             .iter()
             .map(|url| self.scrape_paper(url, task.submission_date, &amtp));
         let stream = futures::stream::iter(paper_futures)
-            .buffer_unordered(25)
+            .buffer_unordered(10)
             .collect::<Vec<_>>();
 
         let papers = stream
@@ -146,7 +146,8 @@ impl Scraper {
             papers,
         };
         let submission_json = serde_json::to_string(&submission)?;
-        println!("Sent body size of {}", submission_json.len());
+        let json_size_mb = submission_json.len() as f64 / 1024. / 1024.;
+        log::info!("Sent body size of {}", json_size_mb);
 
         let submit_path = format!(
             "{}{}",
@@ -335,6 +336,7 @@ fn select_subjects(dom: &scraper::Html) -> Result<Vec<models::NewSubject>> {
     Ok(subjects)
 }
 
+// NOTE: take metrics
 fn body_from_pdf(bytes: &glib::Bytes) -> String {
     let mut body = String::new();
     if let Ok(pdf) = poppler::Document::from_bytes(bytes, None) {
