@@ -13,16 +13,17 @@ anyhow = "1.0.80"
 env_logger = "0.11.2"
 serde = { version = "1.0.197", features = ["derive"] }
 figment = { version = "0.10.14", features = ["env"] }
-reqwest = { version = "0.11.26", default-features = false, features = [
+reqwest = { version = "0.12.2", default-features = false, features = [
   "rustls-tls",
+  "multipart",
 ] }
 tokio = { version = "1.36.0", features = ["full"] }
 indicatif = "0.17.8"
 chrono = { version = "0.4.35", features = ["serde"] }
 serde_json = "1.0.114"
 scraper = "0.19.0"
-poppler-rs = { version = "0.22.0", features = ["v22_2"] }
-glib = "0.18.5"
+poppler-rs = { version = "0.23.0", features = ["v22_2"] }
+glib = "0.19.3"
 regex = "1.10.3"
 futures = "0.3.30"
 futures-util = "0.3.30"

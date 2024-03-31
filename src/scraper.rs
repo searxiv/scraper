@@ -68,7 +68,7 @@ impl Scraper {
         let end_date = task
             .submission_date
             .succ_opt()
-            .unwrap()
+            .unwrap() // NOTE(mchernigin): probably not the last representable date
             .format("%Y-%m-%d")
             .to_string();
 
@@ -116,7 +116,11 @@ impl Scraper {
             .map(|url| url.replace("arxiv.org", "export.arxiv.org"))
             .collect::<Vec<_>>();
 
-        log::info!("Starting to scrape {} papers", paper_urls_to_download.len());
+        log::info!(
+            "Starting to scrape {} papers from {}",
+            paper_urls_to_download.len(),
+            start_date
+        );
 
         let total_progress = indicatif::ProgressBar::new(paper_urls_to_download.len() as u64)
             .with_style(
@@ -145,21 +149,34 @@ impl Scraper {
             submission_date: task.submission_date,
             papers,
         };
+
+        self.submit(submission).await?;
+
+        Ok(())
+    }
+
+    pub async fn submit(&self, submission: models::TaskSubmission) -> anyhow::Result<()> {
         let submission_json = serde_json::to_string(&submission)?;
         let json_size_mb = submission_json.len() as f64 / 1024. / 1024.;
-        log::info!("Sent body size of {}", json_size_mb);
+        log::info!("Sent body size of {} MB", json_size_mb);
 
+        let submission_date = submission.submission_date.format("%Y-%m-%d").to_string();
         let submit_path = format!(
-            "{}{}",
-            &self.config.archivist_url, &self.config.archivist_submit_task_path
+            "{}{}/{}",
+            &self.config.archivist_url, &self.config.archivist_submit_task_path, &submission_date
         );
 
-        self.client
-            .post(&submit_path)
-            .header("Content-Type", "application/json")
-            .body(submission_json)
-            .send()
-            .await?;
+        let part = reqwest::multipart::Part::text(submission_json);
+        let file = reqwest::multipart::Form::new().part("key", part);
+
+        let resp = self.client.put(&submit_path).multipart(file).send().await?;
+        if !resp.status().is_success() {
+            log::error!(
+                "Could not submit. Erorr ({}): {}",
+                resp.status(),
+                resp.text().await?
+            )
+        }
 
         Ok(())
     }
