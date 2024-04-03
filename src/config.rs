@@ -5,6 +5,7 @@ pub struct Config {
     pub archivist_submit_task_path: String,
     pub search_url_pattern: String,
     pub request_interval_millis: u64,
+    pub concurrent_jobs: usize,
     pub log_level: String,
 }
 
@@ -16,6 +17,7 @@ impl Default for Config {
             archivist_submit_task_path: "/tasks".to_string(),
             request_interval_millis: 500,
             log_level: "info".to_string(),
+            concurrent_jobs: 5,
             search_url_pattern: "
                 https://arxiv.org/search/advanced?
                 advanced=&terms-0-operator=AND&

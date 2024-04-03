@@ -136,7 +136,7 @@ impl Scraper {
             .iter()
             .map(|url| self.scrape_paper(url, task.submission_date, &amtp));
         let stream = futures::stream::iter(paper_futures)
-            .buffer_unordered(10)
+            .buffer_unordered(self.config.concurrent_jobs)
             .collect::<Vec<_>>();
 
         let papers = stream
