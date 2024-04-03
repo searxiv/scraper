@@ -14,9 +14,15 @@ tasks:
   - push: |
       cd searxiv-scraper
       git fetch
-      [ $(git rev-parse HEAD) == $(git rev-parse origin/main) ] \
+      [ "$(git rev-parse HEAD)" == "$(git rev-parse origin/main)" ] \
         && docker tag searxiv-scraper-cur mchernigin/searxiv-scraper:latest \
         && docker push mchernigin/searxiv-scraper:latest
       [ "$(git describe --exact-match)" != "" ] \
         && docker tag searxiv-scraper-cur mchernigin/searxiv-scraper:$(git describe --exact-match) \
-        && docker push mchernigin/searxiv-scraper:$(git describe --exact-match)
+        && docker push mchernigin/searxiv-scraper:$(git describe --exact-match) \
+        || echo "Not pushing tagged version"
+triggers:
+  - action: email
+    condition: failure
+    to: Michael Chernigin <michaelchernigin@gmail.com>
+

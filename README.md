@@ -1,5 +1,7 @@
 # SearXiv: scraper
 
+[![builds.sr.ht status](https://builds.sr.ht/~mchernigin/searxiv-scraper.svg)](https://builds.sr.ht/~mchernigin/searxiv-scraper)
+
 This module is responsible for getting actual data from arXiv's API. It tries to
 be simple and lightweight to run on virtual private server's where internet
 speed is reasonable for the task. You can run multiple scraper instances, they

@@ -1,0 +1,14 @@
+image: alpine/edge
+packages:
+  - rustup
+  - glib-dev
+  - cairo-dev
+  - poppler-glib
+  - poppler-dev
+tasks:
+  - setup: |
+      rustup-init -y
+  - clippy-check: |
+      . .cargo/env
+      cd searxiv-scraper
+      cargo clippy
