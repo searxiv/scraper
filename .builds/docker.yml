@@ -1,0 +1,22 @@
+image: archlinux
+packages:
+  - docker
+  - docker-buildx
+secrets:
+  - eea12303-b4e8-4633-b668-84e673268430
+tasks:
+  - setup: |
+      sudo systemctl enable --now docker
+      cat ~/.dockerhub_token | docker login -u mchernigin --password-stdin
+  - build: |
+      cd searxiv-scraper
+      docker buildx build -t searxiv-scraper-cur .
+  - push: |
+      cd searxiv-scraper
+      git fetch
+      [ $(git rev-parse HEAD) == $(git rev-parse origin/main) ] \
+        && docker tag searxiv-scraper-cur mchernigin/searxiv-scraper:latest \
+        && docker push mchernigin/searxiv-scraper:latest
+      [ "$(git describe --exact-match)" != "" ] \
+        && docker tag searxiv-scraper-cur mchernigin/searxiv-scraper:$(git describe --exact-match) \
+        && docker push mchernigin/searxiv-scraper:$(git describe --exact-match)
